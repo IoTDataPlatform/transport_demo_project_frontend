@@ -61,7 +61,7 @@ const getVehicleIcon = (status: Vehicle["status"]) => {
 };
 
 const Map: React.FC = () => {
-  const mapCenter: LatLngExpression = [59.93428, 30.335098]; // Центр Санкт-Петербурга
+  const mapCenter: LatLngExpression = [59.3326, 18.0649]; // Центр Стокгольма
 
   return (
     <MapContainer
