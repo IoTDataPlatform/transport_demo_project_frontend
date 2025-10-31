@@ -1,111 +1,44 @@
 import React from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Polyline,
-} from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import L, { type LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
-import iconUrl from "leaflet/dist/images/marker-icon.png";
-import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
-import shadowUrl from "leaflet/dist/images/marker-shadow.png";
-import type { Stop, Vehicle } from "./Map.types";
-
-L.Icon.Default.mergeOptions({
-  iconUrl,
-  iconRetinaUrl,
-  shadowUrl,
-});
-
-const mockStops: Stop[] = [
-  { id: "stop1", name: "Центральный вокзал", position: [59.93, 30.362] },
-  { id: "stop2", name: "Парк Культуры", position: [59.935, 30.35] },
-  { id: "stop3", name: "Технологический институт", position: [59.917, 30.322] },
-];
-
-const mockVehicles: Vehicle[] = [
-  { id: "bus-5A-1", position: [59.932, 30.355], route: "5A", status: "onTime" },
-  { id: "bus-5A-2", position: [59.925, 30.34], route: "5A", status: "delayed" },
-  { id: "bus-12-1", position: [59.92, 30.33], route: "12", status: "critical" },
-];
-
-const route5A_path: LatLngExpression[] = [
-  [59.93, 30.362],
-  [59.935, 30.35],
-  [59.925, 30.34],
-];
-
-const route12_path: LatLngExpression[] = [
-  [59.93, 30.362],
-  [59.92, 30.33],
-  [59.917, 30.322],
-];
+import type { Vehicle } from "./Map.types";
+import DynamicStopsLayer from "../../modules/DynamicStopsLayer";
 
 const getVehicleIcon = (status: Vehicle["status"]) => {
-  const colorMap = {
-    onTime: "bg-blue",
-    delayed: "bg-orange",
-    critical: "bg-red",
-  };
-  const colorClass = colorMap[status];
+    const colorMap = {
+        onTime: "bg-blue",
+        delayed: "bg-orange",
+        critical: "bg-red",
+    };
+    const colorClass = colorMap[status];
 
-  return L.divIcon({
-    className: `vehicle-icon ${colorClass}`,
-    html: `🚌`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
+    return L.divIcon({
+        className: `vehicle-icon ${colorClass}`,
+        html: `🚌`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+    });
 };
 
 const Map: React.FC = () => {
-  const mapCenter: LatLngExpression = [59.3326, 18.0649]; // Центр Стокгольма
+    const mapCenter: LatLngExpression = [59.3326, 18.0649]; // Центр Стокгольма
 
-  return (
-    <MapContainer
-      center={mapCenter}
-      zoom={14}
-      style={{ height: "80vh", width: "80vw" }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-
-      <Polyline
-        pathOptions={{ color: "blue", weight: 3 }}
-        positions={route5A_path}
-      />
-      <Polyline
-        pathOptions={{ color: "orange", weight: 3 }}
-        positions={route12_path}
-      />
-
-      {mockStops.map((stop) => (
-        <Marker key={stop.id} position={stop.position}>
-          <Popup>
-            <b>Остановка:</b> {stop.name}
-          </Popup>
-        </Marker>
-      ))}
-
-      {mockVehicles.map((vehicle) => (
-        <Marker
-          key={vehicle.id}
-          position={vehicle.position}
-          icon={getVehicleIcon(vehicle.status)}
+    return (
+        <MapContainer
+            center={mapCenter}
+            zoom={14}
+            style={{ height: "80vh", width: "80vw" }}
         >
-          <Popup>
-            <b>ID:</b> {vehicle.id} <br />
-            <b>Маршрут:</b> {vehicle.route} <br />
-            <b>Статус:</b> {vehicle.status}
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
-  );
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            <DynamicStopsLayer />
+        </MapContainer>
+    );
 };
 
 export default Map;
