@@ -1,22 +1,15 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type FC } from "react";
 import { Marker, Polyline, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import type { RouteGeometryOutput } from "../api/map/map.types";
-import busStopPng from "../assets/bus-station.png";
+import type { RouteGeometryOutput } from "../../api/map/map.types";
+import { stopIcon } from "../../utils/mapIcons";
 
 type Props = {
     geometry: RouteGeometryOutput | null;
     showStops?: boolean;
 };
 
-const stopIcon = L.icon({
-    iconUrl: busStopPng,
-    iconSize: [24, 24],
-    iconAnchor: [12, 24],
-    popupAnchor: [0, -24],
-});
-
-const RouteLayer: React.FC<Props> = ({ geometry, showStops = true }) => {
+const RouteLayer: FC<Props> = ({ geometry, showStops = true }) => {
     const map = useMap();
 
     const polylines: L.LatLngExpression[][] = useMemo(() => {
@@ -43,15 +36,24 @@ const RouteLayer: React.FC<Props> = ({ geometry, showStops = true }) => {
     return (
         <>
             {polylines.map((coords, idx) => (
-                <Polyline key={`${geometry.routeId}-${idx}`} positions={coords} />
+                <Polyline
+                    key={`${geometry.routeId}-${idx}`}
+                    positions={coords}
+                />
             ))}
 
             {showStops &&
                 geometry.stops.map((st) => (
-                    <Marker key={st.id} position={[st.lat, st.lon]} icon={stopIcon}>
+                    <Marker
+                        key={st.id}
+                        position={[st.lat, st.lon]}
+                        icon={stopIcon}
+                    >
                         <Popup>
                             <b>{st.name}</b>
-                            <div style={{ fontSize: 12, opacity: 0.8 }}>{st.id}</div>
+                            <div style={{ fontSize: 12, opacity: 0.8 }}>
+                                {st.id}
+                            </div>
                         </Popup>
                     </Marker>
                 ))}
