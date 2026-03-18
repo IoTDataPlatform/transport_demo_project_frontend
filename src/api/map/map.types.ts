@@ -3,21 +3,21 @@ export type StopsInRectInput = {
     topLeftLon: number;
     bottomRightLat: number;
     bottomRightLon: number;
-}
+};
 
 export type StopsInRectOutput = {
     id: string;
     name: string;
     lat: number;
     lon: number;
-}
+};
 
 export type RoutesThroughStopOutput = {
     routeId: string;
     shortName: string;
     longName: string | null;
     routeType: number;
-}
+};
 
 export type RouteScheduleAtStopOutput = {
     stopId: string;
@@ -27,25 +27,25 @@ export type RouteScheduleAtStopOutput = {
     longName: string | null;
     routeType: number;
     times: string[];
-}
+};
 
 type Stop = {
     id: string;
     name: string;
     lat: number;
     lon: number;
-}
+};
 
 type Shape = {
     shapeId: string;
-    points: Array<{"lat": number, "lon": number}>;
-}
+    points: Array<{ lat: number; lon: number }>;
+};
 
 export type RouteGeometryOutput = {
     routeId: string;
     stops: Stop[];
     shapes: Shape[];
-}
+};
 
 export type TripSummary = {
     tripId: string;
@@ -55,6 +55,10 @@ export type TripSummary = {
     shapeId: string;
     shortName: string | null;
     blockId: string | null;
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
 };
 
 export type VehiclePosition = {
@@ -89,8 +93,8 @@ export type TripStop = {
     lat: number;
     lon: number;
     sequence: number;
-    arrivalTime: string;    // "HH:mm:ss"
-    departureTime: string;  // "HH:mm:ss"
+    arrivalTime: string; // "HH:mm:ss"
+    departureTime: string; // "HH:mm:ss"
 };
 
 export type TripStopsOutput = {
