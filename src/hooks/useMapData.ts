@@ -6,7 +6,6 @@ import {
     getTripShape,
     getTripStops,
 } from "../api/map/map.requests";
-
 import type {
     RouteGeometryOutput,
     TripSummary,
@@ -14,6 +13,7 @@ import type {
     TripShapeOutput,
     TripStopsOutput,
 } from "../api/map/map.types";
+import { getActiveTrips, getTodayDateString } from "../utils/time";
 
 export const useMapData = () => {
     const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export const useMapData = () => {
     const [tripDetailsLoading, setTripDetailsLoading] =
         useState<boolean>(false);
     const [tripDetailsError, setTripDetailsError] = useState<string | null>(
-        null
+        null,
     );
     const activeRouteRequestId = useRef<string | null>(null);
 
@@ -59,9 +59,10 @@ export const useMapData = () => {
         setVehicles([]);
 
         try {
+            const today = getTodayDateString();
             const [geometry, tripsResp] = await Promise.all([
                 getRouteGeometry(trimmed),
-                getTripsByRoute(trimmed),
+                getTripsByRoute(trimmed, today),
             ]);
 
             if (activeRouteRequestId.current !== trimmed) return;
@@ -69,14 +70,15 @@ export const useMapData = () => {
             setRouteGeometry(geometry);
             setTrips(tripsResp);
 
+            const activeTrips = getActiveTrips(tripsResp);
             const positions = await Promise.all(
-                tripsResp.map((t) =>
-                    getVehiclePosition(t.tripId, 84600).catch(() => null)
-                )
+                activeTrips.map((t) =>
+                    getVehiclePosition(t.tripId, 84600).catch(() => null),
+                ),
             );
             const ok = positions.filter(
                 (v): v is VehiclePosition =>
-                    !!v && v.lat != null && v.lon != null
+                    !!v && v.lat != null && v.lon != null,
             );
             setVehicles(ok);
         } catch (e: unknown) {
@@ -130,7 +132,7 @@ export const useMapData = () => {
                 setTripDetailsError(e);
             } else {
                 setTripDetailsError(
-                    "Не удалось загрузить геометрию и остановки рейса"
+                    "Не удалось загрузить геометрию и остановки рейса",
                 );
             }
             setSelectedTripShape(null);
@@ -163,15 +165,16 @@ export const useMapData = () => {
         let cancelled = false;
         const refresh = async () => {
             try {
+                const activeTrips = getActiveTrips(trips);
                 const positions = await Promise.all(
-                    trips.map((t) =>
-                        getVehiclePosition(t.tripId, 60).catch(() => null)
-                    )
+                    activeTrips.map((t) =>
+                        getVehiclePosition(t.tripId, 60).catch(() => null),
+                    ),
                 );
                 if (cancelled) return;
                 const ok = positions.filter(
                     (v): v is VehiclePosition =>
-                        !!v && v.lat != null && v.lon != null
+                        !!v && v.lat != null && v.lon != null,
                 );
                 setVehicles(ok);
             } catch (e) {
